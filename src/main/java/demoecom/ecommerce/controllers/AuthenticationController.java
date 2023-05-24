@@ -11,7 +11,7 @@ import demoecom.ecommerce.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/Auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
@@ -19,7 +19,7 @@ public class AuthenticationController {
     AuthenticationService authService;
 
     @PostMapping("/registration")
-    public ResponseEntity<String> registration (@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthenticationResponse> registration (@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
     

@@ -30,11 +30,11 @@ public class AuthenticationService {
     @Autowired
     AuthenticationManager authenticationManager;
 
-    public String register(RegisterRequest request) {
+    public AuthenticationResponse register(RegisterRequest request) {
 
         User user = new User();
-        user.setFirstName(request.getFistName());
-        user.setLastName(request.getLastName());
+        user.setName(request.getName());
+        user.setSurname(request.getSurname());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.USER);
@@ -43,7 +43,7 @@ public class AuthenticationService {
 
         String jwtToken = jwtService.generateToken(user);
         
-        return jwtToken;
+        return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
     public AuthenticationResponse authenticate(AuthenticatonRequest request) {

@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="user")
+@Table(name="users")
 public class User implements UserDetails {
 
     @Id
@@ -31,11 +31,11 @@ public class User implements UserDetails {
     @Column(name="ID")
     private Integer ID;
 
-    @Column(name="first-name")
-    private String firstName;
+    @Column(name="name")
+    private String name;
 
-    @Column(name="last-name")
-    private String lastName;
+    @Column(name="surname")
+    private String surname;
 
     @Column(name="email", nullable = false, unique = true)
     private String email;
