@@ -27,11 +27,11 @@ public class UserService {
 
     public UserDTO updateUser(User user) throws RuntimeException {
 
-        if(user == null) {
+        User tmp = userRepository.findByEmail(user.getEmail());
+
+        if(tmp == null) {
             throw new UserNotFoundException();
         }
-
-        User tmp = userRepository.findByEmail(user.getEmail());
 
         tmp.setName(user.getName());
         tmp.setSurname(user.getSurname());

@@ -27,33 +27,24 @@
             [] getUserCart
 
             [] buy
-
-        []Service
-            [] controlli + exception
-        []Repository
 ---------------------------------------
 
     [] PRODUCT
-        [] @Entity
-            [] ID
-            [] name
-            [] brand
-            [] quantity
-            [] uniCode
-            [] version
+        [x] @Entity
+            [x] ID
+            [x] name
+            [x] brand
+            [x] quantity
+            [x] uniCode
+            [x] version
         
-        [] @RestController
-            [] GRANULARITA SICUREZZA
+        [x] @RestController
+            [x] GRANULARITA SICUREZZA
 
-            [] add
-            [] update
-            [] Remove
-            [] getAll
-
-        []Service
-            [] controlli + exception
-            
-        [] @Repository
+            [x] add
+            [x] update
+            [x] Remove
+            [x] getAll
 ---------------------------------------
 
     [] PRODUCT IN CART (Product In Purchase)
