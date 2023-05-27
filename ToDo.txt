@@ -1,0 +1,81 @@
+[] AuthenticationService
+    [] controlli registration (regex ecc)
+
+---------------------------------------
+
+    [] USER [x]  UserDTO
+        [] @RestController
+            [] GRANULARITA SICUREZZA
+
+            CHIAMATE CON HttpServletRequest -> AGGIUNTA EXTRACT EMAIL IN JwtService
+
+            [x] update
+            [x] upgrade ROLE
+            [x] degrade ROLE
+            [x] deleteAccount   ( MIGLIORE IMPLEMENTAZIONE DELLA RISPOSTA DEL SERVIZO )
+            [x] RemoveUser  ( MIGLIORE IMPLEMENTAZIONE DELLA RISPOSTA DEL SERVIZO )
+            [x] getAll
+
+            []CHANGE PASSWORD ?????
+
+            [] addToCart
+            [] removeFromCart
+            [] getUserByProduct
+
+            
+            [] getCart
+            [] getUserCart
+
+            [] buy
+
+        []Service
+            [] controlli + exception
+        []Repository
+---------------------------------------
+
+    [] PRODUCT
+        [] @Entity
+            [] ID
+            [] name
+            [] brand
+            [] quantity
+            [] uniCode
+            [] version
+        
+        [] @RestController
+            [] GRANULARITA SICUREZZA
+
+            [] add
+            [] update
+            [] Remove
+            [] getAll
+
+        []Service
+            [] controlli + exception
+            
+        [] @Repository
+---------------------------------------
+
+    [] PRODUCT IN CART (Product In Purchase)
+
+        SINGOLO PRODOTTO NEL CARRELLO DELLO USER
+
+        [] @Entity
+            [] ID
+            [] Product
+            [] product.name
+            [] product.quantity
+            [] User
+            [] user.name/email
+
+        []Repository
+---------------------------------------
+
+    [] CART
+        
+        CARRELLO SINGOLO PER UTENTE CONTENTITORE DEI PRODUCT IN PURCASE
+
+        [] @Entity
+            [] ID
+            [] Product In Purchase
+            [] User (owner)

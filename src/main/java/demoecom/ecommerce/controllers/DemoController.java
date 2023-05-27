@@ -13,12 +13,13 @@ public class DemoController {
     @GetMapping("/demoUSER")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<String> sayHelloUser() {
-        return ResponseEntity.ok("hello User");
+        return ResponseEntity.ok("Hello User");
     }
 
     @GetMapping("/demoADMIN")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> sayHelloAdmin() {
-        return ResponseEntity.ok("hello admin");
+        return ResponseEntity.ok("Hello Admin");
     }
 
 

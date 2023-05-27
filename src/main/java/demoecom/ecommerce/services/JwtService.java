@@ -14,14 +14,23 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class JwtService {
 
     private static final String SECRET_KEY = "58703273357638792F423F4528482B4D6251655468576D597133743677397A24";
 
-    public String extractUserEmail(String jwtToken) {
+    public String extractEmailFromToken(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
+    }
+    
+    public String extractEmailFromRequest(HttpServletRequest request) {
+        
+        final String authHeader = request.getHeader("Authorization");
+        final String jwtToken = authHeader.substring(7); 
+
+        return extractEmailFromToken(jwtToken);
     }
 
     public <T> T extractClaim(String jwtToken, Function<Claims, T> claimResolver) {
@@ -48,7 +57,7 @@ public class JwtService {
     }
     
     public boolean isTokenValid(String jwtToken, User user) {
-        final String userEmail = extractUserEmail(jwtToken);
+        final String userEmail = extractEmailFromToken(jwtToken);
 
         return (userEmail.equals(user.getUsername()) && !isTokenExpired(jwtToken));
     }

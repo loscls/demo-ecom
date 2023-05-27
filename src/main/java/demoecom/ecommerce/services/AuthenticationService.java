@@ -32,6 +32,9 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegisterRequest request) {
 
+        //AGGIUNGERE CONTROLLI AGGIUNTA UTENTE 
+        //REGEX
+
         User user = new User();
         user.setName(request.getName());
         user.setSurname(request.getSurname());
