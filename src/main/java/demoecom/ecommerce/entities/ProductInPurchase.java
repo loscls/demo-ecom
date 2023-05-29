@@ -1,10 +1,5 @@
 package demoecom.ecommerce.entities;
 
-import java.util.List;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -12,9 +7,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,35 +18,31 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="products")
-public class Product {
+@Table(name="product_in_purchase")
+public class ProductInPurchase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="ID")
     private Integer ID;
+    
+    @ManyToOne
+    @JoinColumn(name="product")
+    private Product product;
 
-    @Column(name="name")
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name="users")
+    private User users;
+
     private String name;
 
-    @Column(name="brand")
     private String brand;
 
-    @Column(name="uni_code", nullable = false, unique = true)
     private String uniCode;
 
-    @Column(name="quality")
-    private int quantity;
-
-    @Column(name="price")
     private float price;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "product")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<ProductInPurchase> user;
-
-    @Version
-    private Integer version;
-        
+    private int quantity;
+    
 }

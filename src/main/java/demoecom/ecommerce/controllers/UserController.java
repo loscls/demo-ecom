@@ -90,5 +90,49 @@ public class UserController {
             return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);            
         }
     }
+
+    @PutMapping("/addToCart")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<Object> addToCart (HttpServletRequest request, @RequestParam("unicode") String uniCode, @RequestParam("quantity") int quantity) {
+        try {
+            String email = jwtService.extractEmailFromRequest(request);
+            return new ResponseEntity<Object>(userService.addToCart(email, uniCode, quantity), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/removeFromCart")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<Object> removeFromCart (HttpServletRequest request, @RequestParam("unicode") String uniCode, @RequestParam("quantity") int quantity) {
+        try {
+            String email = jwtService.extractEmailFromRequest(request);
+            return new ResponseEntity<Object>(userService.removeFromCart(email, uniCode, quantity), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+        }
+    }
     
+    @GetMapping("/getCart")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<Object> getCart (HttpServletRequest request) {
+        try {
+            String email = jwtService.extractEmailFromRequest(request);
+            return new ResponseEntity<Object>(userService.getCart(email), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/getUserByProduct")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Object> getUserByProduct (@RequestParam("unicode") String uniCode) {
+        try {
+            return new ResponseEntity<Object>(userService.getUserByProduct(uniCode), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
 }

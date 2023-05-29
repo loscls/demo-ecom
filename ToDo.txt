@@ -7,7 +7,7 @@
         [] @RestController
             [] GRANULARITA SICUREZZA
 
-            CHIAMATE CON HttpServletRequest -> AGGIUNTA EXTRACT EMAIL IN JwtService
+            [x] CHIAMATE CON HttpServletRequest -> AGGIUNTA EXTRACT EMAIL IN JwtService
 
             [x] update
             [x] upgrade ROLE
@@ -18,18 +18,20 @@
 
             []CHANGE PASSWORD ?????
 
-            [] addToCart
-            [] removeFromCart
-            [] getUserByProduct
+            [x] addToCart
+            [x] removeFromCart
+            [x] getUserByProduct
 
             
-            [] getCart
+            [x] getCart
             [] getUserCart
 
+
+            [] SALDO UTENTE
             [] buy
 ---------------------------------------
 
-    [] PRODUCT
+    [x] PRODUCT
         [x] @Entity
             [x] ID
             [x] name
@@ -47,19 +49,19 @@
             [x] getAll
 ---------------------------------------
 
-    [] PRODUCT IN CART (Product In Purchase)
+    [x] PRODUCT IN CART (Product In Purchase)
 
         SINGOLO PRODOTTO NEL CARRELLO DELLO USER
 
-        [] @Entity
-            [] ID
-            [] Product
-            [] product.name
-            [] product.quantity
-            [] User
+        [x] @Entity
+            [x] ID
+            [x] Product
+            [x] product.name
+            [x] product.quantity
+            [x] User
             [] user.name/email
 
-        []Repository
+        [x]Repository
 ---------------------------------------
 
     [] CART
