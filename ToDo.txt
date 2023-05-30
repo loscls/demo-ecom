@@ -1,5 +1,5 @@
-[] AuthenticationService
-    [] controlli registration (regex ecc)
+[x] AuthenticationService
+    [x] controlli registration (regex ecc)
 
 ---------------------------------------
 
@@ -24,8 +24,6 @@
 
             
             [x] getCart
-            [] getUserCart
-
 
             [x] SALDO UTENTE
             [x] buy
@@ -59,7 +57,6 @@
             [x] product.name
             [x] product.quantity
             [x] User
-            [] user.name/email
 
         [x]Repository
 ---------------------------------------
