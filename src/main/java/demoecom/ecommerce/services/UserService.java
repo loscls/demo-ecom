@@ -13,6 +13,8 @@ import demoecom.ecommerce.entities.Product;
 import demoecom.ecommerce.entities.ProductInPurchase;
 import demoecom.ecommerce.entities.Role;
 import demoecom.ecommerce.entities.User;
+import demoecom.ecommerce.exceptions.BalanceNotEnoughException;
+import demoecom.ecommerce.exceptions.BalanceNotValidException;
 import demoecom.ecommerce.exceptions.IncorrectPasswordException;
 import demoecom.ecommerce.exceptions.ProductNotEnoughException;
 import demoecom.ecommerce.exceptions.ProductNotFoundException;
@@ -23,6 +25,7 @@ import demoecom.ecommerce.exceptions.UserNotFoundException;
 import demoecom.ecommerce.repositories.ProductInPurchaseRepository;
 import demoecom.ecommerce.repositories.ProductRepository;
 import demoecom.ecommerce.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -113,7 +116,7 @@ public class UserService {
 
     }
 
-    public String deleteAccount(String email, String password) {
+    public String deleteAccount(String email, String password) throws RuntimeException {
         User u = userRepository.findByEmail(email);
 
         if (u == null) {
@@ -130,6 +133,23 @@ public class UserService {
         userRepository.delete(u);
 
         return "Your account has been deleted";
+    }
+
+    public User addBalance(String email, float balance) throws RuntimeException {
+        User u = userRepository.findByEmail(email);
+
+        if (u == null) {
+            throw new UserNotFoundException();
+        }
+
+        if (balance <= 0) {
+            throw new BalanceNotValidException();
+        }
+
+        u.setBalance(u.getBalance()+balance);
+        userRepository.save(u);
+
+        return u;
     }
 
     public List<UserDTO> getAll() {
@@ -179,7 +199,7 @@ public class UserService {
         }
     }
 
-    public List<ProductDTO> removeFromCart (String email, String uniCode, int quantity) {
+    public List<ProductDTO> removeFromCart (String email, String uniCode, int quantity) throws RuntimeException {
         User u = userRepository.findByEmail(email);
         Product p = productRepository.findByUniCode(uniCode);
         ProductInPurchase pIP = pIPRepository.findByUsersAndProduct(u, p);
@@ -221,6 +241,47 @@ public class UserService {
         return productDTOs;
     }
 
+    @Transactional
+    public List<ProductDTO> buyProduct (String email, String uniCode, int quantity) throws RuntimeException {
+        User u = userRepository.findByEmail(email);
+        Product p = productRepository.findByUniCode(uniCode);
+        ProductInPurchase pIP = pIPRepository.findByUsersAndProduct(u, p);
+
+        if (u == null) {
+            throw new UserNotFoundException();
+        }
+
+        if(!(u.getCart().contains(pIP))) {
+            throw new ProductNotInCartException();
+        }
+
+        if((pIP.getPrice()*quantity) > u.getBalance()) {
+            throw new BalanceNotEnoughException();
+        }
+
+        if((quantity <= pIP.getQuantity()) && pIP.getQuantity() <= p.getQuantity()) {
+            pIP.setQuantity(pIP.getQuantity()-quantity);
+
+            if(pIP.getQuantity() == 0) {
+                u.getCart().remove(pIP);
+            }
+
+            p.setQuantity(p.getQuantity()-quantity);
+
+            float total = pIP.getPrice()*quantity;
+            u.setBalance(u.getBalance()-total);
+
+            pIPRepository.save(pIP);
+            productRepository.save(p);
+            userRepository.save(u);
+
+            System.out.println(u);            
+            return getCart(u.getEmail());
+        } else {
+            throw new ProductNotEnoughException();
+        }
+    }
+
     public List<User> getUserByProduct (String uniCode) throws RuntimeException {
         Product p = productRepository.findByUniCode(uniCode);
         List<User> userList = new ArrayList<>();
@@ -235,8 +296,6 @@ public class UserService {
         }
 
         return userList;
-
-
     }
 
     

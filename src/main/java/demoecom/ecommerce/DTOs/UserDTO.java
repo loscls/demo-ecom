@@ -13,12 +13,14 @@ public class UserDTO {
     private String name;
     private String surname;
     private String email;
+    private float balance;
     private demoecom.ecommerce.entities.Role Role;
 
     public UserDTO(User user) {
         this.name = user.getName();
         this.surname = user.getSurname();
         this.email = user.getEmail();
+        this.balance = user.getBalance();
         this.Role = user.getRole();
     }
     

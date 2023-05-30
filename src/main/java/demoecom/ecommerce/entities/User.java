@@ -53,6 +53,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name="balance")
+    private float balance;
+    
     @JsonIgnore
     @OneToMany(mappedBy = "users")
     @OnDelete(action = OnDeleteAction.CASCADE)

@@ -3,9 +3,9 @@
 
 ---------------------------------------
 
-    [] USER [x]  UserDTO
-        [] @RestController
-            [] GRANULARITA SICUREZZA
+    [x] USER [x]  UserDTO
+        [x] @RestController
+            [x] GRANULARITA SICUREZZA
 
             [x] CHIAMATE CON HttpServletRequest -> AGGIUNTA EXTRACT EMAIL IN JwtService
 
@@ -27,8 +27,8 @@
             [] getUserCart
 
 
-            [] SALDO UTENTE
-            [] buy
+            [x] SALDO UTENTE
+            [x] buy
 ---------------------------------------
 
     [x] PRODUCT

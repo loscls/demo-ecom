@@ -11,6 +11,7 @@ import demoecom.ecommerce.controllers.AuthenticatonRequest;
 import demoecom.ecommerce.controllers.RegisterRequest;
 import demoecom.ecommerce.entities.Role;
 import demoecom.ecommerce.entities.User;
+import demoecom.ecommerce.exceptions.TypeDataMismatchException;
 import demoecom.ecommerce.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -30,10 +31,16 @@ public class AuthenticationService {
     @Autowired
     AuthenticationManager authenticationManager;
 
+    public boolean isValidEmail(String email) throws RuntimeException{
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        return email.matches(emailRegex);
+    }
+
     public AuthenticationResponse register(RegisterRequest request) {
 
-        //AGGIUNGERE CONTROLLI AGGIUNTA UTENTE 
-        //REGEX
+        if(!isValidEmail(request.getEmail())){
+            throw new TypeDataMismatchException();
+        }
 
         User user = new User();
         user.setName(request.getName());
@@ -55,7 +62,7 @@ public class AuthenticationService {
 
         User user = userRepository.findByEmail(request.getEmail());
 
-        String jwtToken =  jwtService.generateToken(user);
+        String jwtToken = jwtService.generateToken(user);
 
         return AuthenticationResponse.builder().token(jwtToken).build();
     }

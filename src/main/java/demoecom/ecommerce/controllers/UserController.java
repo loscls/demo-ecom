@@ -70,7 +70,7 @@ public class UserController {
 
     @DeleteMapping("/deleteAccount")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<Object> deleteAccount (HttpServletRequest request, @RequestParam String password) {
+    public ResponseEntity<Object> deleteAccount (HttpServletRequest request, @RequestParam("password") String password) {
         try {
             String email = jwtService.extractEmailFromRequest(request);
             String response = userService.deleteAccount(email, password);
@@ -78,7 +78,17 @@ public class UserController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
         }
+    }
 
+    @PutMapping("/addBalance")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<Object> addBalance (HttpServletRequest request, @RequestParam("balance") float balance) {
+        try {
+            String email = jwtService.extractEmailFromRequest(request);
+            return new ResponseEntity<Object>(userService.addBalance(email, balance), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+        }
     }
     
     @GetMapping("/getAll")
@@ -122,6 +132,17 @@ public class UserController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/buyProduct")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<Object> buyProduct (HttpServletRequest request, @RequestParam("unicode") String uniCode, @RequestParam("quantity") int quantity) {
+        try {
+            String email = jwtService.extractEmailFromRequest(request);
+            return new ResponseEntity<Object>(userService.buyProduct(email, uniCode, quantity), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+        } 
     }
 
     @GetMapping("/getUserByProduct")
