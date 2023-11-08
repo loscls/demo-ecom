@@ -35,14 +35,7 @@ public class ProductInPurchase {
     @JoinColumn(name="users")
     private User users;
 
-    private String name;
-
-    private String brand;
-
-    private String uniCode;
-
-    private float price;
+    private double totalPrice;
 
     private int quantity;
-    
 }

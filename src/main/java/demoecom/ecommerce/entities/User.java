@@ -54,7 +54,7 @@ public class User implements UserDetails {
     private Role role;
 
     @Column(name="balance")
-    private float balance;
+    private double balance;
     
     @JsonIgnore
     @OneToMany(mappedBy = "users")

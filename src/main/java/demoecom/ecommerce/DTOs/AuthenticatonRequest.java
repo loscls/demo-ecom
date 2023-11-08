@@ -1,4 +1,4 @@
-package demoecom.ecommerce.controllers;
+package demoecom.ecommerce.DTOs;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

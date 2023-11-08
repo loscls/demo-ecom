@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import demoecom.ecommerce.DTOs.ProductDTO;
 import demoecom.ecommerce.DTOs.UserDTO;
 import demoecom.ecommerce.entities.Product;
 import demoecom.ecommerce.entities.ProductInPurchase;
@@ -43,9 +42,9 @@ public class UserService {
 
    
 
-    public UserDTO updateUser(User user) throws RuntimeException {
+    public UserDTO updateUser(String email, User user) throws RuntimeException {
 
-        User tmp = userRepository.findByEmail(user.getEmail());
+        User tmp = userRepository.findByEmail(email);
 
         if(tmp == null) {
             throw new UserNotFoundException();
@@ -54,7 +53,6 @@ public class UserService {
         tmp.setName(user.getName());
         tmp.setSurname(user.getSurname());
         tmp.setEmail(user.getEmail());
-        tmp.setRole(user.getRole());
         
         userRepository.save(tmp);
 
@@ -152,6 +150,20 @@ public class UserService {
         return u;
     }
 
+    public UserDTO getUser(String email) {
+
+        User u = userRepository.findByEmail(email);
+
+        if(u == null) {
+            throw new UserNotFoundException();
+        }
+        
+        UserDTO uDTO = new UserDTO(u);
+
+        return uDTO;
+
+    }
+
     public List<UserDTO> getAll() {
         List<UserDTO> listDTO = new ArrayList<>();
 
@@ -183,7 +195,7 @@ public class UserService {
         }
         
         if(pIP == null) {
-            pIP = new ProductInPurchase(null, p, u, p.getName(), p.getBrand(), p.getUniCode(), p.getPrice(), quantity);
+            pIP = new ProductInPurchase(null, p, u, p.getPrice()*quantity, quantity);
             u.getCart().add(pIP);
             pIPRepository.save(pIP);
             userRepository.save(u);
@@ -192,6 +204,7 @@ public class UserService {
 
         if((pIP.getQuantity()+quantity) <= p.getQuantity()) {
             pIP.setQuantity(pIP.getQuantity()+quantity);
+            pIP.setTotalPrice(p.getPrice()*pIP.getQuantity());
             pIPRepository.save(pIP);            
             return pIP;
         } else {
@@ -199,7 +212,39 @@ public class UserService {
         }
     }
 
-    public List<ProductDTO> removeFromCart (String email, String uniCode, int quantity) throws RuntimeException {
+    public ProductInPurchase updateProductInCart(String email, String uniCode, int quantity) throws RuntimeException {
+        User u = userRepository.findByEmail(email);
+        Product p = productRepository.findByUniCode(uniCode);
+        ProductInPurchase pIP = pIPRepository.findByUsersAndProduct(u, p);
+
+        if (u == null) {
+            throw new UserNotFoundException();
+        }
+
+        System.out.println(uniCode);
+        if(p == null) {
+            throw new ProductNotFoundException();
+        }
+
+        if(!(u.getCart().contains(pIP))) {
+            throw new ProductNotInCartException();
+        }
+
+        if (pIP == null) {
+            return addToCart(email, uniCode, quantity);
+        } else if (quantity == pIP.getQuantity()) {
+            return pIP;
+        } else if (quantity < p.getQuantity()) {
+            pIP.setQuantity(quantity);
+            pIP.setTotalPrice(pIP.getProduct().getPrice()*quantity);
+            pIPRepository.save(pIP);
+            return pIP;
+        } else {
+            throw new ProductNotEnoughException();
+        }
+    }
+
+    public List<ProductInPurchase> removeFromCart (String email, String uniCode, int quantity) throws RuntimeException {
         User u = userRepository.findByEmail(email);
         Product p = productRepository.findByUniCode(uniCode);
         ProductInPurchase pIP = pIPRepository.findByUsersAndProduct(u, p);
@@ -221,28 +266,35 @@ public class UserService {
             pIPRepository.save(pIP);
             return getCart(pIP.getUsers().getEmail());
         } else {
-            u.getCart().remove(pIP);
-            userRepository.save(u);
-            return getCart(pIP.getUsers().getEmail());
+            pIPRepository.delete(pIP);
+            return getCart(u.getEmail());
         }
     }
 
-    public List<ProductDTO> getCart (String email) throws RuntimeException {
-        List<ProductDTO> productDTOs = new ArrayList<>();
+    public List<ProductInPurchase> getCart (String email) throws RuntimeException {
         User u = userRepository.findByEmail(email);
 
         List<ProductInPurchase> Cart = u.getCart();
 
-        for(ProductInPurchase pIP : Cart) {
-            ProductDTO pDTO = new ProductDTO(pIP);
-            productDTOs.add(pDTO);
-        }
-
-        return productDTOs;
+        return Cart;
     }
 
+    public double getTotalPrice (String email) throws RuntimeException {
+        User u = userRepository.findByEmail(email);
+
+        List<ProductInPurchase> Cart = u.getCart();
+
+        double totalPrice = 0;
+
+        for(ProductInPurchase pIP : Cart) {
+            totalPrice += pIP.getTotalPrice();
+        }
+
+        return totalPrice;
+    } 
+
     @Transactional
-    public List<ProductDTO> buyProduct (String email, String uniCode, int quantity) throws RuntimeException {
+    public List<ProductInPurchase> buyProduct (String email, String uniCode, int quantity) throws RuntimeException {
         User u = userRepository.findByEmail(email);
         Product p = productRepository.findByUniCode(uniCode);
         ProductInPurchase pIP = pIPRepository.findByUsersAndProduct(u, p);
@@ -255,27 +307,28 @@ public class UserService {
             throw new ProductNotInCartException();
         }
 
-        if((pIP.getPrice()*quantity) > u.getBalance()) {
+        if((pIP.getTotalPrice()) > u.getBalance()) {
             throw new BalanceNotEnoughException();
         }
 
         if((quantity <= pIP.getQuantity()) && pIP.getQuantity() <= p.getQuantity()) {
             pIP.setQuantity(pIP.getQuantity()-quantity);
+            pIPRepository.save(pIP);
 
             if(pIP.getQuantity() == 0) {
                 u.getCart().remove(pIP);
+                pIPRepository.delete(pIP);
             }
 
             p.setQuantity(p.getQuantity()-quantity);
 
-            float total = pIP.getPrice()*quantity;
-            u.setBalance(u.getBalance()-total);
+            u.setBalance(u.getBalance()-pIP.getTotalPrice());
 
-            pIPRepository.save(pIP);
             productRepository.save(p);
             userRepository.save(u);
 
-            System.out.println(u);            
+            System.out.println("ho comprato prodotto: " + pIP.getProduct().getName());
+         
             return getCart(u.getEmail());
         } else {
             throw new ProductNotEnoughException();

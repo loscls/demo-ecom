@@ -13,7 +13,7 @@ public class UserDTO {
     private String name;
     private String surname;
     private String email;
-    private float balance;
+    private double balance;
     private demoecom.ecommerce.entities.Role Role;
 
     public UserDTO(User user) {

@@ -44,7 +44,10 @@ public class Product {
     private int quantity;
 
     @Column(name="price")
-    private float price;
+    private double price;
+
+    @Column(name="image")
+    private String image;
 
     @JsonIgnore
     @OneToMany(mappedBy = "product")

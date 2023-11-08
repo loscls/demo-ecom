@@ -1,16 +1,15 @@
-package demoecom.ecommerce.controllers;
+package demoecom.ecommerce.DTOs;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationResponse {
+public class UpdateProductInCartRequest {
 
-    private String token;
+    private String unicode;
+    private int quantity;
     
 }

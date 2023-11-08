@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import demoecom.ecommerce.filters.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
 
     @Autowired
     JwtAuthenticationFilter jwtAuthFilter;
@@ -26,12 +28,25 @@ public class SecurityConfig {
     @Autowired
     AuthenticationProvider authenticationProvider;
 
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+        .allowedOrigins("http://localhost:4200")
+        .allowedMethods("*");;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+        http.cors();
+
         http.csrf().disable();
         http.authorizeHttpRequests().requestMatchers("/auth/**").permitAll();
+        http.authorizeHttpRequests().requestMatchers("/product/getAll").permitAll();
+        http.authorizeHttpRequests().requestMatchers("/product/getPage").permitAll();
+        http.authorizeHttpRequests().requestMatchers("/product/getSearch").permitAll();
         http.authorizeHttpRequests().anyRequest().authenticated();
+        
             
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         

@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import demoecom.ecommerce.DTOs.AddBalanceRequest;
+import demoecom.ecommerce.DTOs.AddToCartRequest;
+import demoecom.ecommerce.DTOs.UpdateProductInCartRequest;
 import demoecom.ecommerce.entities.User;
 import demoecom.ecommerce.services.JwtService;
 import demoecom.ecommerce.services.UserService;
@@ -29,9 +32,10 @@ public class UserController {
 
     @PutMapping("/updateUser")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<Object> updateUser (@RequestBody User user) {
+    public ResponseEntity<Object> updateUser (@RequestParam String email, @RequestBody User user) {
         try {
-            return new ResponseEntity<Object>(userService.updateUser(user), HttpStatus.OK);
+            System.out.println("ENTRATO CONTROLLER UPDATE USER");
+            return new ResponseEntity<Object>(userService.updateUser(email, user), HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
         }
@@ -82,10 +86,21 @@ public class UserController {
 
     @PutMapping("/addBalance")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<Object> addBalance (HttpServletRequest request, @RequestParam("balance") float balance) {
+    public ResponseEntity<Object> addBalance (HttpServletRequest request, @RequestBody AddBalanceRequest addBalanceRequest) {
         try {
             String email = jwtService.extractEmailFromRequest(request);
-            return new ResponseEntity<Object>(userService.addBalance(email, balance), HttpStatus.OK);
+            return new ResponseEntity<Object>(userService.addBalance(email, addBalanceRequest.getBalance()), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/getUser")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<Object> getUser(HttpServletRequest request) {
+        try {
+            String email = jwtService.extractEmailFromRequest(request);
+            return new ResponseEntity<Object>(userService.getUser(email), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
         }
@@ -103,13 +118,25 @@ public class UserController {
 
     @PutMapping("/addToCart")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<Object> addToCart (HttpServletRequest request, @RequestParam("unicode") String uniCode, @RequestParam("quantity") int quantity) {
+    public ResponseEntity<Object> addToCart (HttpServletRequest request, @RequestBody AddToCartRequest addToCartRrequest) {
         try {
             String email = jwtService.extractEmailFromRequest(request);
-            return new ResponseEntity<Object>(userService.addToCart(email, uniCode, quantity), HttpStatus.OK);
+            return new ResponseEntity<Object>(userService.addToCart(email, addToCartRrequest.getUniCode(), addToCartRrequest.getQuantity()), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PutMapping("/updateProductInCart")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<Object> updateProductInCart (HttpServletRequest request, @RequestBody UpdateProductInCartRequest req) {
+        try {
+            String email = jwtService.extractEmailFromRequest(request);
+            return new ResponseEntity<Object>(userService.updateProductInCart(email, req.getUnicode(), req.getQuantity()), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @DeleteMapping("/removeFromCart")
@@ -134,6 +161,17 @@ public class UserController {
         }
     }
 
+    @GetMapping("/getTotalPrice")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<Object> getCartPrice (HttpServletRequest request) {
+        try {
+            String email = jwtService.extractEmailFromRequest(request);
+            return new ResponseEntity<Object>(userService.getTotalPrice(email), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/buyProduct")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<Object> buyProduct (HttpServletRequest request, @RequestParam("unicode") String uniCode, @RequestParam("quantity") int quantity) {
@@ -144,6 +182,16 @@ public class UserController {
             return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
         } 
     }
+
+    // @GetMapping("/buyAll")
+    // public ResponseEntity<Object> buyAll (HttpServletRequest request) {
+    //     try {
+    //         String email = jwtService.extractEmailFromRequest(request);
+    //         return new ResponseEntity<Object>(userService.buyAll(email), HttpStatus.OK)
+    //     } catch (Exception e) {
+    //         return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 
     @GetMapping("/getUserByProduct")
     @PreAuthorize("hasAuthority('ADMIN')")

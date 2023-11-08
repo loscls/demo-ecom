@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import demoecom.ecommerce.DTOs.ProductDTO;
@@ -37,6 +39,7 @@ public class ProductService {
         tmp.setBrand(product.getBrand());
         tmp.setQuantity(product.getQuantity());
         tmp.setPrice(product.getPrice());
+        tmp.setImage(product.getImage());
 
         productRepository.save(tmp);
 
@@ -45,7 +48,7 @@ public class ProductService {
         return p;
     }
 
-    public String removeProduct(String uniCode) throws RuntimeException {
+    public  void removeProduct(String uniCode) throws RuntimeException {
         Product p = productRepository.findByUniCode(uniCode);
 
         if(p == null) {
@@ -53,8 +56,6 @@ public class ProductService {
         }
 
         productRepository.delete(p);
-
-        return "Product: " + uniCode + " has been removed!";
     }
 
     public List<ProductDTO>  getAll() throws RuntimeException {
@@ -68,5 +69,30 @@ public class ProductService {
         }
 
         return pDTOList;
+    }
+
+    public Page<Product> getPage(int pgNumber, int pgSize) throws RuntimeException {
+        PageRequest pageReq = PageRequest.of(pgNumber, pgSize);
+
+        return productRepository.findAll(pageReq);
+    }
+
+    public List<Product> getSearch(String searchTerm) throws RuntimeException {
+
+        List<Product> productsList = productRepository.findAll();
+
+        List<Product> filteredProducts = new ArrayList<>();
+
+        for (Product product : productsList) {
+            if (product.getName().toLowerCase().contains(searchTerm.toLowerCase()) || product.getBrand().toLowerCase().contains(searchTerm.toLowerCase())) {
+                filteredProducts.add(product);
+            }
+        }
+
+        if (filteredProducts.isEmpty()) {
+            throw new ProductNotFoundException();
+        }
+
+        return filteredProducts;
     }
 }

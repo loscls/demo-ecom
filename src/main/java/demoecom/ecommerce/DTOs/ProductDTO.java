@@ -14,8 +14,9 @@ public class ProductDTO {
     private String name;
     private String brand;
     private int quantity;
-    private float price;
+    private double price;
     private String uniCode;
+    private String image;
 
     public ProductDTO(Product product) {
         this.name = product.getName();
@@ -23,13 +24,14 @@ public class ProductDTO {
         this.quantity = product.getQuantity();
         this.price = product.getPrice();
         this.uniCode = product.getUniCode();
+        this.image = product.getImage();
     }
 
     public ProductDTO(ProductInPurchase pIP) {
-        this.name = pIP.getName();
-        this.brand = pIP.getBrand();
-        this.quantity = pIP.getQuantity();
-        this.price = pIP.getPrice();
-        this.uniCode = pIP.getUniCode();
+        this.name = pIP.getProduct().getName();
+        this.brand = pIP.getProduct().getBrand();
+        this.quantity = pIP.getProduct().getQuantity();
+        this.price = pIP.getProduct().getPrice();
+        this.uniCode = pIP.getProduct().getUniCode();
     }
 }

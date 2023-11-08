@@ -6,8 +6,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import demoecom.ecommerce.controllers.AuthenticationResponse;
-import demoecom.ecommerce.controllers.AuthenticatonRequest;
+import demoecom.ecommerce.DTOs.AuthenticationResponse;
+import demoecom.ecommerce.DTOs.AuthenticatonRequest;
 import demoecom.ecommerce.controllers.RegisterRequest;
 import demoecom.ecommerce.entities.Role;
 import demoecom.ecommerce.entities.User;
@@ -49,11 +49,11 @@ public class AuthenticationService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.USER);
 
-        userRepository.save(user);
+        user = userRepository.save(user);
 
         String jwtToken = jwtService.generateToken(user);
         
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return AuthenticationResponse.builder().token(jwtToken).user(user).build();
     }
 
     public AuthenticationResponse authenticate(AuthenticatonRequest request) {
@@ -64,8 +64,22 @@ public class AuthenticationService {
 
         String jwtToken = jwtService.generateToken(user);
 
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        // return AuthenticationResponse.builder().token(jwtToken).build();
+
+        return new AuthenticationResponse(jwtToken, user);
+        //Aggiunto questo return per tornare lo user nel front
     }
+
+    public AuthenticationResponse reloadUser(String email) {
+
+        User user = userRepository.findByEmail(email);
+
+        String jwtToken = jwtService.generateToken(user);
+
+        return new AuthenticationResponse(jwtToken, user);
+
+    }
+
 
 
 }

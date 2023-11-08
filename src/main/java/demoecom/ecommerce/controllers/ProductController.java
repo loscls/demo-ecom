@@ -29,6 +29,7 @@ public class ProductController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Object> addProduct (@RequestBody Product p) {
         try {
+            System.out.println("prodotto:" + p);
             return new ResponseEntity<Object>(productService.addProduct(p), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
@@ -52,21 +53,41 @@ public class ProductController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Object> removeProduct (@RequestParam("unicode") String uniCode) {
         try {
-            return new ResponseEntity<Object>(productService.removeProduct(uniCode), HttpStatus.OK);
+            productService.removeProduct(uniCode);
+            return new ResponseEntity<Object>(HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<Object>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
         }
 
     }
 
     //getAll
     @GetMapping("/getAll")
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    // @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<Object> getAll() {
         try {
             return new ResponseEntity<Object>(productService.getAll(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/getPage")
+    public ResponseEntity<Object> getPage(@RequestParam("pgNumber") int pgNumber, @RequestParam("pgSize") int pgSize) {
+        try {
+            return new ResponseEntity<Object>(productService.getPage(pgNumber, pgSize), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<Object>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    @GetMapping("/getSearch")
+    public ResponseEntity<Object> getSearch(@RequestParam("searchTerm") String searchTerm) {
+        try {
+            return new ResponseEntity<Object>(productService.getSearch(searchTerm), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<Object>(e.getClass().getSimpleName(), HttpStatus.BAD_REQUEST);
         }
     }
     
